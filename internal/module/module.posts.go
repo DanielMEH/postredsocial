@@ -28,6 +28,11 @@ func configureRouterUser(
 				Handler: newPublication.RunNewPublicationAccountHandler,
 			},
 			{
+				Route:   constants.API_ROUTER_STABLE + "/add_like_publication",
+				Method:  fiber.MethodPost,
+				Handler: likePublication.RunLikePublicationHandler,
+			},
+			{
 				Route:   constants.API_ROUTER_STABLE + "/all_publications",
 				Method:  fiber.MethodGet,
 				Handler: getPublication.RunGetPublicationHandler,

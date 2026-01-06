@@ -98,9 +98,9 @@ func (sd *ServicesDatabaseAdapter) GetPublications() (entities.EntityPublication
 	/* Obtenemos posts */
 	result := sd.dbgorm.
 		Order("created_at desc").
-		Preload("Likes").        // Cargamos los likes para contarlos
-		Preload("User").         // Cargamos el usuario
-		Preload("User.Profile"). // Cargamos el perfil anidado
+		Preload("Likes").
+		Preload("User").
+		Preload("User.Profile").
 		Find(&posts)
 
 	if result.Error != nil {
@@ -110,9 +110,10 @@ func (sd *ServicesDatabaseAdapter) GetPublications() (entities.EntityPublication
 	var response []map[string]interface{}
 	for _, p := range posts {
 		// Obtenemos los datos del usuario de forma segura
-		var userEmail, userAlias string
+		var userEmail, userAlias, user_id string
 		userEmail = "Usuario eliminado"
 		if p.UserID != uuid.Nil {
+			user_id = p.UserID.String()
 			userEmail = p.User.Email
 			userAlias = p.User.Profile.Alias
 		}
@@ -122,8 +123,9 @@ func (sd *ServicesDatabaseAdapter) GetPublications() (entities.EntityPublication
 			"message":    p.Message,
 			"created_at": p.CreatedAt,
 			"author": map[string]string{
-				"email": userEmail,
-				"alias": userAlias,
+				"email":   userEmail,
+				"alias":   userAlias,
+				"user_id": user_id,
 			},
 			"likes_count": len(p.Likes),
 		}

@@ -8,4 +8,5 @@ import (
 type PortsRepositoryPosts interface {
 	NewPublication(message string, accountId string) (entities.EntityNewPostResponse, error)
 	LikePublication(postId uuid.UUID, UserId uuid.UUID) (entities.EntityLikePostResponse, error)
+	GetPublications() (entities.EntityPublicationsResponse, error)
 }

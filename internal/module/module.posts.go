@@ -16,6 +16,7 @@ import (
 func configureRouterUser(
 	newPublication *handlers.PublicationAccountHandler,
 	likePublication *handlers.LikePublicationHandler,
+	getPublication *handlers.GetPublicationHandler,
 	Hstore *types.HandlersStore, _ *config.AppSettings) {
 
 	HandlerRouter := types.SliceHandlers{
@@ -27,9 +28,9 @@ func configureRouterUser(
 				Handler: newPublication.RunNewPublicationAccountHandler,
 			},
 			{
-				Route:   constants.API_ROUTER_STABLE + "/add_like_publication",
-				Method:  fiber.MethodPost,
-				Handler: likePublication.RunLikePublicationHandler,
+				Route:   constants.API_ROUTER_STABLE + "/all_publications",
+				Method:  fiber.MethodGet,
+				Handler: getPublication.RunGetPublicationHandler,
 			},
 		},
 	}
@@ -42,6 +43,7 @@ func ModulePublicationsProvider() []fx.Option {
 		// 1. Proveemos el Handler (el controlador)
 		fx.Provide(handlers.NewPublicationAccountHandler),
 		fx.Provide(handlers.NewLikePublicationHandler),
+		fx.Provide(handlers.NewGetPublicationHandler),
 
 		// 2. Dominios puertos
 		fx.Provide(database.NewServicesDatabase,
@@ -52,6 +54,7 @@ func ModulePublicationsProvider() []fx.Option {
 		// fx.Provide(usecases.NewUserUseCase),
 		fx.Provide(application.NewPublicationAccountUseCase),
 		fx.Provide(application.NewLikePublicationUseCase),
+		fx.Provide(application.NewGetPublicationUseCase),
 
 		// 3. Invocamos la configuración de rutas
 		fx.Invoke(configureRouterUser),

@@ -36,8 +36,8 @@ type Post struct {
 	UserID    uuid.UUID `gorm:"type:uuid;index;not null"`
 	Message   string    `gorm:"type:text;not null"`
 	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-	// Relación para traer los likes del post
-	Likes []Like `gorm:"foreignKey:PostID"`
+	User      User      `gorm:"foreignKey:UserID"`
+	Likes     []Like    `gorm:"foreignKey:PostID"`
 }
 
 type Like struct {

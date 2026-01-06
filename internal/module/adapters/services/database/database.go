@@ -90,3 +90,51 @@ func (sd *ServicesDatabaseAdapter) LikePublication(PostId uuid.UUID, UserId uuid
 		},
 	}, nil
 }
+
+func (sd *ServicesDatabaseAdapter) GetPublications() (entities.EntityPublicationsResponse, error) {
+
+	var posts []Post
+
+	/* Obtenemos posts */
+	result := sd.dbgorm.
+		Order("created_at desc").
+		Preload("Likes").        // Cargamos los likes para contarlos
+		Preload("User").         // Cargamos el usuario
+		Preload("User.Profile"). // Cargamos el perfil anidado
+		Find(&posts)
+
+	if result.Error != nil {
+		slog.Error("Error consultando posts", "error", result.Error)
+		return entities.EntityPublicationsResponse{}, config.NewInternalServerError(result.Error)
+	}
+	var response []map[string]interface{}
+	for _, p := range posts {
+		// Obtenemos los datos del usuario de forma segura
+		var userEmail, userAlias string
+		userEmail = "Usuario eliminado"
+		if p.UserID != uuid.Nil {
+			userEmail = p.User.Email
+			userAlias = p.User.Profile.Alias
+		}
+
+		item := map[string]interface{}{
+			"post_id":    p.ID,
+			"message":    p.Message,
+			"created_at": p.CreatedAt,
+			"author": map[string]string{
+				"email": userEmail,
+				"alias": userAlias,
+			},
+			"likes_count": len(p.Likes),
+		}
+		response = append(response, item)
+	}
+	return entities.EntityPublicationsResponse{
+		Message: "ddd",
+		Details: struct {
+			Data []map[string]interface{} "json:\"data\""
+		}{
+			Data: response,
+		},
+	}, nil
+}
